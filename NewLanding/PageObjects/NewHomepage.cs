@@ -1,16 +1,10 @@
 ﻿//This PageObject example uses PageFactory. And it is obsolete. So it will be deleted in nearby future (i mean PageFactory).
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.PageObjects;
-using OpenQA.Selenium.Chrome;
-using System.Windows.Forms;
 using NUnit.Framework;
+using System;
 
 namespace NewLanding.PageObjects
 {
@@ -26,28 +20,38 @@ namespace NewLanding.PageObjects
             
         }
 
-        #region Elements
+        #region Elements in header
+        //Features
         [FindsBy(How =How.CssSelector, Using = "body > div.header > div > ul > li:nth-child(2) > a")]
         public IWebElement featuresLink { get; set; }
 
+        //Pricing
         [FindsBy(How = How.CssSelector, Using = "body > div.header > div > ul > li:nth-child(3) > a")]
         public IWebElement pricingLink { get; set; }
 
+        //Connections
         [FindsBy(How = How.CssSelector, Using = "body > div.header > div > ul > li:nth-child(4) > a")]
         public IWebElement connectionsLink { get; set; }
 
+        //Roadmap
         [FindsBy(How = How.CssSelector, Using = "body > div.header > div > ul > li:nth-child(5) > a")]
         public IWebElement roadmapLink { get; set; }
 
+
+        //B2B
         [FindsBy(How = How.CssSelector, Using = "body > div.header > div > ul > li:nth-child(6) > a")]
         public IWebElement btbLink { get; set; }
 
+        //Blog
         [FindsBy(How = How.CssSelector, Using = "body > div.header > div > ul > li:nth-child(7) > a")]
         public IWebElement blogLink { get; set; }
 
+        //Download button
         [FindsBy(How=How.XPath, Using = "/html/body/div[6]/div/div[1]/a")]
         public IWebElement downloadBtn { get; set; }
+        #endregion
 
+        #region Elements on page
         [FindsBy(How = How.CssSelector, Using = "body > div.block.customization > a")]
         public IWebElement youtubeWrkWorks { get; set; }
 
@@ -64,26 +68,38 @@ namespace NewLanding.PageObjects
         public IWebElement toTopBtn { get; set; }
         #endregion
 
+        //Checking links in header
         public void Test(string expected1, string expected2, string expected3, string expected4, string expected5, string expected6)
         {
-            this.driver.Navigate().GoToUrl("https://www.quantower.com");
+            //Clicking on features, then we do assertions and go to previous page (Main page) 
             featuresLink.Click();
             Assert.AreEqual(expected1, this.driver.Title);
             this.driver.Navigate().Back();
+
+            //Clicking on pricing, then we do assertions and go to previous page (Main page) 
             pricingLink.Click();
             Assert.AreEqual(expected2, this.driver.Title);
             this.driver.Navigate().Back();
+
+            //Clicking on connections, then we do assertions and go to previous page(Main page)
             connectionsLink.Click();
             Assert.AreEqual(expected3, this.driver.Title);
             this.driver.Navigate().Back();
+
+            //Clicking on roadmap, then we do assertions and go to previous page(Main page)
             roadmapLink.Click();
             Assert.AreEqual(expected4, this.driver.Title);
             this.driver.Navigate().Back();
+
+            //Clicking on B2B, then we do assertions and go to previous page (Main page)
             btbLink.Click();
             Assert.AreEqual(expected5, this.driver.Title);
             this.driver.Navigate().Back();
+            //Clicking on blog, then we do assertions
             blogLink.Click();
             Assert.AreEqual(expected6, this.driver.Title);
+
+            //Yippee-ki-yay!!! We did it ;)
         }
 
         public void DownloadBtnTest(string expected)

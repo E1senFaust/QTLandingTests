@@ -1,17 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Support.PageObjects;
 using OpenQA.Selenium.Chrome;
-using System.Windows.Forms;
 using NUnit.Framework;
 using OpenQA.Selenium.Support.UI;
 using NewLanding.PageObjects;
 using OpenQA.Selenium.Interactions;
-using Keys = System.Windows.Forms.Keys;
 
 namespace NewLanding
 {
