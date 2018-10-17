@@ -1,7 +1,6 @@
 ﻿using System;
 using OpenQA.Selenium;
 
-
 namespace NewLanding.PageObjects
 {
     class NewHomepageFooter
@@ -11,14 +10,15 @@ namespace NewLanding.PageObjects
         public NewHomepageFooter(IWebDriver chrome)
         {
             this.driver = chrome;
-            this.driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromMilliseconds(10000);
         }
         //APPLICATION COLUMN
         #region =============Application column=============
         //features from footer
         public By features = By.CssSelector("body > div.footer > div > div.top > div:nth-child(3) > p > a:nth-child(1)");
+        
         //connections
         public By connections = By.CssSelector("body > div.footer > div > div.top > div:nth-child(3) > p > a:nth-child(3)");
+        
         //roadmap
         public By roadmap = By.CssSelector("body > div.footer > div > div.top > div:nth-child(3) > p > a:nth-child(5)");
 
@@ -51,13 +51,14 @@ namespace NewLanding.PageObjects
 
         //terms & conditions
         public By termsAndConditions = By.CssSelector("body > div.footer > div > div.top > div:nth-child(4) > p > a:nth-child(9)");
+        
         //privacy policy
         public By privacyPolicy = By.CssSelector("body > div.footer > div > div.top > div:nth-child(4) > p > a:nth-child(11)");
         #endregion
 
         //SOCIALS COLUMN
-        #region Join us in socials
-            //facebook
+        #region =============Join us in socials=============
+        //facebook
         public By facebookFooter = By.CssSelector("body > div.footer > div > div.top > div:nth-child(5) > ul > li:nth-child(1) > a");
 
             //linkedin

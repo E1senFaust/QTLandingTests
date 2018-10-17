@@ -7,11 +7,8 @@ using OpenQA.Selenium.Support.UI;
 using NewLanding.PageObjects;
 using OpenQA.Selenium.Interactions;
 using NUnit.Framework.Interfaces;
-using System.Drawing;
 using System.IO;
-using System.Text;
 using RelevantCodes.ExtentReports;
-using System.Globalization;
 
 namespace NewLanding
 {
@@ -19,14 +16,15 @@ namespace NewLanding
 
     public class TestRun
     {
-        public IWebDriver Driver { get; set; }
-        public WebDriverWait Wait { get; set; }
-        public ChromeOptions opt { get; set; }
-        public Actions act { get; set; }
-        public ExtentReports extent { get; set; }
-        public ExtentTest test { get; set; }
+        public IWebDriver Driver;
+        public WebDriverWait Wait;
+        public ChromeOptions opt;
+        public Actions act;
+        public ExtentReports extent;
+        public ExtentTest test;
         string formatedBegin;
-         string formatedEnd;
+        string formatedEnd;
+        string expected1, expected2, expected3, expected4, expected5, expected6, expected7;
 
         #region +++++Test initialization+++++
         [OneTimeSetUp]
@@ -39,19 +37,18 @@ namespace NewLanding
                   .AddSystemInfo("Username", System.Environment.UserName.ToString());
             
         }
+
         [SetUp]
         public void Setup()
         {
             formatedBegin = $"<font color='blue'><kbd>Test case {TestContext.CurrentContext.Test.Name} started</kbd></font>";
             formatedEnd = $"<font color='blue'><kbd>Test case {TestContext.CurrentContext.Test.Name} ended</kbd></font>";
-            opt = new ChromeOptions();
-            opt.AddArguments("--headless");
+            //opt = new ChromeOptions();
+            //opt.AddArguments("--headless");
             
             Driver = new ChromeDriver();
             Driver.Manage().Window.Maximize();
-            Driver.Navigate().GoToUrl("https://www.quantower.com");
             Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromMilliseconds(10000);
-
         }
 
         [TearDown]
@@ -83,45 +80,47 @@ namespace NewLanding
         public void Features()
         {
             #region Expected strings
-            string exp1 = "Professional Online Trading Software | Quantower — Quantower trading platform";
-            string exp2 = "Prices & Licenses — Quantower trading platform";
-            string exp3 = "List of available connections and data providers — Quantower trading platform";
-            string exp4 = "Quantower roadmap - features that coming soon — Quantower trading platform";
-            string exp5 = "B2B solutions for your business — Quantower trading platform";
-            string exp6 = "News and updates — Quantower trading platform";
+            expected1 = "Professional Online Trading Software | Quantower — Quantower trading platform";
+            expected2 = "Prices & Licenses — Quantower trading platform";
+            expected3 = "List of available connections and data providers — Quantower trading platform";
+            expected4 = "Quantower roadmap - features that coming soon — Quantower trading platform";
+            expected5 = "B2B solutions for your business — Quantower trading platform";
+            expected6 = "News and updates — Quantower trading platform";
             #endregion
+
             test = extent.StartTest("Features");
             test.Log(LogStatus.Info, formatedBegin);
+            Driver.Navigate().GoToUrl("https://www.quantower.com");
             NewHomepage newpage = new NewHomepage(this.Driver);
             //Clicking on features, then we do assertions and go to previous page (Main page) 
             Driver.FindElement(newpage.featuresLink).Click();
-            Assertions(exp1, "Features page", "Current page is not a FEATURES");
+            Assertions(expected1, "Features page", "Current page is not a FEATURES");
             Driver.Navigate().Back();
 
             //Clicking on pricing, then we do assertions and go to previous page (Main page) 
             Driver.FindElement(newpage.pricingLink).Click();
-            Assertions(exp2, "Pricing page", "Current page is not a PRICING");
+            Assertions(expected2, "Pricing page", "Current page is not a PRICING");
             //Assert.AreEqual(expected2, this.driver.Title);
             Driver.Navigate().Back();
 
             //Clicking on connections, then we do assertions and go to previous page(Main page)
             Driver.FindElement(newpage.connectionsLink).Click();
-            Assertions(exp3, "Connections page", "Current page is not a CONNECTIONS");
+            Assertions(expected3, "Connections page", "Current page is not a CONNECTIONS");
             Driver.Navigate().Back();
 
             //Clicking on roadmap, then we do assertions and go to previous page(Main page)
             Driver.FindElement(newpage.roadmapLink).Click();
-            Assertions(exp4, "Roadmap page", "Current page is not a ROADMAP");
+            Assertions(expected4, "Roadmap page", "Current page is not a ROADMAP");
             Driver.Navigate().Back();
 
             //Clicking on B2B, then we do assertions and go to previous page (Main page)
             Driver.FindElement(newpage.btbLink).Click();
-            Assertions(exp5, "B2B page", "Current page is not a B2B");
+            Assertions(expected5, "B2B page", "Current page is not a B2B");
             Driver.Navigate().Back();
 
             //Clicking on blog, then we do assertions
             Driver.FindElement(newpage.blogLink).Click();
-            Assertions(exp6, "Blog page", "Current page is not a BLOG");
+            Assertions(expected6, "Blog page", "Current page is not a BLOG");
             test.Log(LogStatus.Info, formatedEnd);
 
             //Yippee-ki-yay!!! We did it ;)
@@ -132,6 +131,7 @@ namespace NewLanding
         {
             test = extent.StartTest("DownloadBtnCheck");
             test.Log(LogStatus.Info, formatedBegin);
+            Driver.Navigate().GoToUrl("https://www.quantower.com");
             NewHomepage page = new NewHomepage(this.Driver);
             
             try
@@ -148,11 +148,12 @@ namespace NewLanding
         [Test, Category("MainPage")]
         public void GotoYoutubeWorkspacesWatching()
         {
+            string title = "Quantower roadmap - features that coming soon — Quantower trading platform";
             test = extent.StartTest("GotoYoutubeWorkspacesWatching");
             test.Log(LogStatus.Info, formatedBegin);
-            string title = "Quantower roadmap - features that coming soon — Quantower trading platform";
-            NewHomepage page = new NewHomepage(this.Driver);
+            Driver.Navigate().GoToUrl("https://www.quantower.com");
             
+            NewHomepage page = new NewHomepage(this.Driver);
             Driver.FindElement(page.moreInRoadmap).Click();
             Assertions(title, "GoTo Roadmap");
             test.Log(LogStatus.Info, formatedEnd);
@@ -161,12 +162,14 @@ namespace NewLanding
         [Test, Category("MainPage")]
         public void SocialsButtonsCheck()
         {
+            expected1 = "Quantower - Главная | фейсбук";
+            expected2 = "Telegram: Contact @quantower";
             test = extent.StartTest("SocialsButtonsCheck");
             test.Log(LogStatus.Info, formatedBegin);
-            string expected1 = "Quantower - Главная | фейсбук";
-            string expected2 = "Telegram: Contact @quantower";
+            Driver.Navigate().GoToUrl("https://www.quantower.com");
+            
             NewHomepage page = new NewHomepage(this.Driver);
-            page.ScrollOneFrame(3500);
+            PixelScroller(3500);
             Driver.FindElement(page.facebookBtn).Click();
             Driver.SwitchTo().Window(Driver.WindowHandles[1]);
             Assertions(expected1, "Facebook button click");
@@ -185,8 +188,10 @@ namespace NewLanding
         {
             test = extent.StartTest("TotopButtonAppears");
             test.Log(LogStatus.Info, formatedBegin);
+            Driver.Navigate().GoToUrl("https://www.quantower.com");
+
             NewHomepage page = new NewHomepage(Driver);
-            page.ScrollOneFrame(3000);
+            PixelScroller(3000);
             Thread.Sleep(300);
             try
             {
@@ -223,7 +228,6 @@ namespace NewLanding
         public void FooterApplication_Column()
         {
             #region Expected strings
-            string expected1, expected2, expected3, expected4, expected5, expected6, expected7;
             expected1 = "Professional Online Trading Software | Quantower — Quantower trading platform";
             expected2 = "List of available connections and data providers — Quantower trading platform";
             expected3 = "Quantower roadmap - features that coming soon — Quantower trading platform";
@@ -232,8 +236,11 @@ namespace NewLanding
             expected6 = "QUANTOWER API | Quantower API";
             expected7 = "Frequently asked questions — Quantower trading platform";
             #endregion
+
             test = extent.StartTest("FooterApplication_Column");
             test.Log(LogStatus.Info, formatedBegin);
+            Driver.Navigate().GoToUrl("https://www.quantower.com");
+
             NewHomepageFooter footer = new NewHomepageFooter(Driver);
             PixelScroller(10000);
 
@@ -274,14 +281,7 @@ namespace NewLanding
         [Test, Category("Footer")]
         public void FooterCompany_Column()
         {
-            test = extent.StartTest("FooterCompany_Column");
-            test.Log(LogStatus.Info, formatedBegin);
-            NewHomepageFooter footer = new NewHomepageFooter(Driver);
-            
-            PixelScroller(10000);
-
             #region Expected strings
-            string expected1, expected2, expected3, expected4, expected5, expected6;
             expected1 = "Quantower team and values — Quantower trading platform";
             expected2 = "News and updates — Quantower trading platform";
             expected3 = "B2B solutions for your business — Quantower trading platform";
@@ -289,28 +289,40 @@ namespace NewLanding
             expected5 = "Terms and policies — Quantower trading platform";
             expected6 = "Terms and policies — Quantower trading platform";
             #endregion
+            test = extent.StartTest("FooterCompany_Column");
+            test.Log(LogStatus.Info, formatedBegin);
+            Driver.Navigate().GoToUrl("https://www.quantower.com");
 
+            NewHomepageFooter footer = new NewHomepageFooter(Driver);
+            
+            PixelScroller(10000);
+            
+            //click on team link in footer and do assertion
             Driver.FindElement(footer.team).Click();
             Assertions(expected1, "Team");
-
             Driver.Navigate().Back();
 
+            //click on blog link in footer and do assertion
             Driver.FindElement(footer.blog).Click();
             Assertions(expected2, "Blog");
             Driver.Navigate().Back();
 
+            //click on B2B link in footer and do assertion
             Driver.FindElement(footer.BtB).Click();
             Assertions(expected3, "B2B");
             Driver.Navigate().Back();
 
+            //click on Contact Us link in footer and do assertion
             Driver.FindElement(footer.contactUs).Click();
             Assertions(expected4, "ContactUs");
             Driver.Navigate().Back();
 
+            //click on Terms link in footer and do assertion
             Driver.FindElement(footer.termsAndConditions).Click();
             Assertions(expected5, "Terms and Conditions");
             Driver.Navigate().Back();
 
+            //click on Privacy link in footer and do assertion
             Driver.FindElement(footer.privacyPolicy).Click();
             Assertions(expected6, "Privacy policy");
 
@@ -320,11 +332,6 @@ namespace NewLanding
         [Test, Category("Footer")]
         public void FooterSocials_Column()
         {
-            test = extent.StartTest("FooterSocials_Column");
-            test.Log(LogStatus.Info, formatedBegin);
-            NewHomepageFooter footer = new NewHomepageFooter(Driver);
-            PixelScroller(10000);
-
             #region Expected strings
             string expected1, expected2, expected3, expected4, expected5;
             expected1 = "Quantower - Главная | фейсбук";
@@ -334,6 +341,13 @@ namespace NewLanding
             expected5 = "Quantower trading platform - YouTube";
             #endregion
 
+            test = extent.StartTest("FooterSocials_Column");
+            test.Log(LogStatus.Info, formatedBegin);
+            Driver.Navigate().GoToUrl("https://www.quantower.com");
+
+            NewHomepageFooter footer = new NewHomepageFooter(Driver);
+            PixelScroller(10000);
+            
             Driver.FindElement(footer.facebookFooter).Click();
             Driver.SwitchTo().Window(Driver.WindowHandles[1]);
             Assertions(expected1, "Facebook");
@@ -405,7 +419,6 @@ namespace NewLanding
             try
             {
                 Assert.IsTrue(Driver.Title == expected, "Title isn't equal {0}", expected);
-                //test.Log(LogStatus.Pass, StepAndScreenshot);
                 test.Log(LogStatus.Pass, formatedMessagePass);
             }
             catch

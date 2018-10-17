@@ -21,6 +21,8 @@ D:\NewLanding\NewLanding\NewLanding\obj\Debug\NewLanding.csproj.CopyComplete
 D:\NewLanding\NewLanding\NewLanding\obj\Debug\NewLanding.dll
 D:\NewLanding\NewLanding\NewLanding\obj\Debug\NewLanding.pdb
 D:\NewLanding\NewLanding\NewLanding\obj\Debug\NewLanding.csprojAssemblyReference.cache
+D:\NewLanding\NewLanding\QTLandingTests\NewLanding\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.xml
+D:\NewLanding\NewLanding\QTLandingTests\NewLanding\bin\Debug\WebDriver.Support.xml
 D:\NewLanding\NewLanding\QTLandingTests\NewLanding\bin\Debug\NUnit3.TestAdapter.dll
 D:\NewLanding\NewLanding\QTLandingTests\NewLanding\bin\Debug\NUnit3.TestAdapter.pdb
 D:\NewLanding\NewLanding\QTLandingTests\NewLanding\bin\Debug\nunit.engine.dll
@@ -48,7 +50,6 @@ D:\NewLanding\NewLanding\QTLandingTests\NewLanding\bin\Debug\WebDriver.dll
 D:\NewLanding\NewLanding\QTLandingTests\NewLanding\bin\Debug\WebDriver.Support.dll
 D:\NewLanding\NewLanding\QTLandingTests\NewLanding\bin\Debug\HtmlAgilityPack.pdb
 D:\NewLanding\NewLanding\QTLandingTests\NewLanding\bin\Debug\HtmlAgilityPack.xml
-D:\NewLanding\NewLanding\QTLandingTests\NewLanding\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.xml
 D:\NewLanding\NewLanding\QTLandingTests\NewLanding\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml
 D:\NewLanding\NewLanding\QTLandingTests\NewLanding\bin\Debug\MongoDB.Bson.xml
 D:\NewLanding\NewLanding\QTLandingTests\NewLanding\bin\Debug\MongoDB.Driver.xml
@@ -59,7 +60,6 @@ D:\NewLanding\NewLanding\QTLandingTests\NewLanding\bin\Debug\nunit.framework.xml
 D:\NewLanding\NewLanding\QTLandingTests\NewLanding\bin\Debug\RazorEngine.xml
 D:\NewLanding\NewLanding\QTLandingTests\NewLanding\bin\Debug\System.Web.Razor.xml
 D:\NewLanding\NewLanding\QTLandingTests\NewLanding\bin\Debug\WebDriver.xml
-D:\NewLanding\NewLanding\QTLandingTests\NewLanding\bin\Debug\WebDriver.Support.xml
 D:\NewLanding\NewLanding\QTLandingTests\NewLanding\obj\Debug\NewLanding.csproj.CoreCompileInputs.cache
 D:\NewLanding\NewLanding\QTLandingTests\NewLanding\obj\Debug\NewLanding.csproj.CopyComplete
 D:\NewLanding\NewLanding\QTLandingTests\NewLanding\obj\Debug\NewLanding.dll
