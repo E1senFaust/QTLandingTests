@@ -6,90 +6,220 @@ using NUnit.Framework;
 using OpenQA.Selenium.Support.UI;
 using NewLanding.PageObjects;
 using OpenQA.Selenium.Interactions;
+using NUnit.Framework.Interfaces;
+using System.Drawing;
+using System.IO;
+using System.Text;
+using RelevantCodes.ExtentReports;
+using System.Globalization;
 
 namespace NewLanding
 {
     [TestFixture]
+
     public class TestRun
     {
         public IWebDriver Driver { get; set; }
         public WebDriverWait Wait { get; set; }
         public ChromeOptions opt { get; set; }
         public Actions act { get; set; }
+        public ExtentReports extent { get; set; }
+        public ExtentTest test { get; set; }
+        string formatedBegin;
+         string formatedEnd;
 
+        #region +++++Test initialization+++++
+        [OneTimeSetUp]
+        public void OneTimeSetup()
+        {
+            CheckTestdataDirectory();
+            string reportPath = @"C:\TestData\TestReport.html";
+            extent = new ExtentReports(reportPath, true);
+            extent.AddSystemInfo("Environment", System.Environment.OSVersion.ToString() + "<br>Processors count "+System.Environment.ProcessorCount.ToString() + "<br>Windows 8.1,  Chrome, x64OS")
+                  .AddSystemInfo("Username", System.Environment.UserName.ToString());
+            
+        }
         [SetUp]
         public void Setup()
         {
+            formatedBegin = $"<font color='blue'><kbd>Test case {TestContext.CurrentContext.Test.Name} started</kbd></font>";
+            formatedEnd = $"<font color='blue'><kbd>Test case {TestContext.CurrentContext.Test.Name} ended</kbd></font>";
             opt = new ChromeOptions();
             opt.AddArguments("--headless");
-            this.Driver = new ChromeDriver();
-            this.Driver.Manage().Window.Maximize();
-            Driver.Navigate().GoToUrl("https://www.quantower.com");
-            this.Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromMilliseconds(10000);
             
+            Driver = new ChromeDriver();
+            Driver.Manage().Window.Maximize();
+            Driver.Navigate().GoToUrl("https://www.quantower.com");
+            Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromMilliseconds(10000);
+
         }
 
         [TearDown]
         public void TearDown()
         {
+            var status = TestContext.CurrentContext.Result.Outcome.Status;
+            var stackTrace = TestContext.CurrentContext.Result.StackTrace;
+            var errorMessage = TestContext.CurrentContext.Result.Message;
+            if (status == TestStatus.Failed)
+            {
+                test.Log(LogStatus.Fail, status + errorMessage);
+            }
+            extent.EndTest(test);
+
             //this.Driver.Manage().Cookies.DeleteAllCookies();
-            this.Driver.Quit();
+            Driver.Quit();
         }
 
-         [Test, Retry(3)]
+        [OneTimeTearDown]
+        public void EndReport()
+        {
+            extent.Flush();
+            extent.Close();
+        }
+        #endregion
+
+        #region =====MainPage basic tests=====
+        [Test, Category("MainPage")]
         public void Features()
         {
+            #region Expected strings
             string exp1 = "Professional Online Trading Software | Quantower — Quantower trading platform";
             string exp2 = "Prices & Licenses — Quantower trading platform";
             string exp3 = "List of available connections and data providers — Quantower trading platform";
             string exp4 = "Quantower roadmap - features that coming soon — Quantower trading platform";
             string exp5 = "B2B solutions for your business — Quantower trading platform";
             string exp6 = "News and updates — Quantower trading platform";
-
-
+            #endregion
+            test = extent.StartTest("Features");
+            test.Log(LogStatus.Info, formatedBegin);
             NewHomepage newpage = new NewHomepage(this.Driver);
-            newpage.Test(exp1, exp2, exp3, exp4, exp5, exp6);
-            //    Driver.Navigate().GoToUrl("https://www.quantower.com/homepagenew");
-            //    newpage.featuresLink.Click();
-            //    Assert.AreEqual("Testy", this.Driver.Title);
+            //Clicking on features, then we do assertions and go to previous page (Main page) 
+            Driver.FindElement(newpage.featuresLink).Click();
+            Assertions(exp1, "Features page", "Current page is not a FEATURES");
+            Driver.Navigate().Back();
+
+            //Clicking on pricing, then we do assertions and go to previous page (Main page) 
+            Driver.FindElement(newpage.pricingLink).Click();
+            Assertions(exp2, "Pricing page", "Current page is not a PRICING");
+            //Assert.AreEqual(expected2, this.driver.Title);
+            Driver.Navigate().Back();
+
+            //Clicking on connections, then we do assertions and go to previous page(Main page)
+            Driver.FindElement(newpage.connectionsLink).Click();
+            Assertions(exp3, "Connections page", "Current page is not a CONNECTIONS");
+            Driver.Navigate().Back();
+
+            //Clicking on roadmap, then we do assertions and go to previous page(Main page)
+            Driver.FindElement(newpage.roadmapLink).Click();
+            Assertions(exp4, "Roadmap page", "Current page is not a ROADMAP");
+            Driver.Navigate().Back();
+
+            //Clicking on B2B, then we do assertions and go to previous page (Main page)
+            Driver.FindElement(newpage.btbLink).Click();
+            Assertions(exp5, "B2B page", "Current page is not a B2B");
+            Driver.Navigate().Back();
+
+            //Clicking on blog, then we do assertions
+            Driver.FindElement(newpage.blogLink).Click();
+            Assertions(exp6, "Blog page", "Current page is not a BLOG");
+            test.Log(LogStatus.Info, formatedEnd);
+
+            //Yippee-ki-yay!!! We did it ;)
         }
 
-         [Test, Retry(3)]
+        [Test, Category("MainPage")]
         public void DownloadBtnCheck()
         {
+            test = extent.StartTest("DownloadBtnCheck");
+            test.Log(LogStatus.Info, formatedBegin);
             NewHomepage page = new NewHomepage(this.Driver);
-            page.DownloadBtnTest("GET THE PLATFORM");
+            
+            try
+            {
+                Assert.IsNotNull(Driver.FindElement(page.downloadBtn));
+                //Expected result was changed for making test fail. Under normal conditions should be "GET THE PLATFORM"
+                Assert.AreEqual("GET THE APP", Driver.FindElement(page.downloadBtn).Text);
+                test.Log(LogStatus.Pass, "<font color='green'><b>Download button exist & text displays normally</b></font>");
+            }
+            catch { test.Log(LogStatus.Fail, "<font color='red'><b>Download button is null</font>"); }
+            test.Log(LogStatus.Info, formatedEnd);
         }
 
-         [Test, Retry(3)]
+        [Test, Category("MainPage")]
         public void GotoYoutubeWorkspacesWatching()
         {
+            test = extent.StartTest("GotoYoutubeWorkspacesWatching");
+            test.Log(LogStatus.Info, formatedBegin);
             string title = "Quantower roadmap - features that coming soon — Quantower trading platform";
-            string url = "https://www.quantower.com/roadmap";
             NewHomepage page = new NewHomepage(this.Driver);
-            page.MoreInRoadmap(title, url);
+            
+            Driver.FindElement(page.moreInRoadmap).Click();
+            Assertions(title, "GoTo Roadmap");
+            test.Log(LogStatus.Info, formatedEnd);
         }
-         [Test, Retry(3)]
+
+        [Test, Category("MainPage")]
         public void SocialsButtonsCheck()
         {
+            test = extent.StartTest("SocialsButtonsCheck");
+            test.Log(LogStatus.Info, formatedBegin);
+            string expected1 = "Quantower - Главная | фейсбук";
+            string expected2 = "Telegram: Contact @quantower";
             NewHomepage page = new NewHomepage(this.Driver);
-            page.SocialsButtons("Quantower - Главная | фейсбук", "Telegram: Contact @quantower");
+            page.ScrollOneFrame(3500);
+            Driver.FindElement(page.facebookBtn).Click();
+            Driver.SwitchTo().Window(Driver.WindowHandles[1]);
+            Assertions(expected1, "Facebook button click");
+            Driver.Close();
+
+            Driver.SwitchTo().Window(Driver.WindowHandles[0]);
+            Driver.FindElement(page.telegramBtn).Click();
+            Driver.SwitchTo().Window(Driver.WindowHandles[1]);
+            Assertions(expected2, "Telegram button click");
+
+            test.Log(LogStatus.Info, formatedEnd);
         }
 
-         [Test, Retry(3)]
+        [Test, Category("MainPage")]
         public void TotopButtonAppears()
         {
+            test = extent.StartTest("TotopButtonAppears");
+            test.Log(LogStatus.Info, formatedBegin);
             NewHomepage page = new NewHomepage(Driver);
-            Driver.Navigate().GoToUrl("https://www.quantower.com");
             page.ScrollOneFrame(3000);
             Thread.Sleep(300);
-            Assert.IsTrue(page.toTopBtn.Displayed, "ToTop button is not visible");
-            page.toTopBtn.Click();
-            Thread.Sleep(1000);
-            Assert.IsFalse(page.toTopBtn.Displayed, "ToTop button is VISIBLE");
-        }
+            try
+            {
+                Assert.IsTrue(Driver.FindElement(page.toTopBtn).Displayed);
+                test.Log(LogStatus.Pass, "ToTop button is not visible");
+            }
+            catch
+            {
+                string screenShotPath = Capture(Driver, "ToTop button is not visible");
+                Capture(Driver, "Totop button");
+                test.Log(LogStatus.Fail, test.AddScreenCapture(screenShotPath));
+            }
 
-        [Test, Retry(3)]
+            Driver.FindElement(page.toTopBtn).Click();
+            Thread.Sleep(1000);
+
+            try
+            {
+                Assert.IsFalse(Driver.FindElement(page.toTopBtn).Displayed);
+                test.Log(LogStatus.Pass, "ToTop button is not visible");
+            }
+            catch
+            {
+                string screenShotPath = Capture(Driver, "ToTop button is not visible");
+                Capture(Driver, "Totop button");
+                test.Log(LogStatus.Fail, test.AddScreenCapture(screenShotPath));
+            }
+            test.Log(LogStatus.Info, formatedEnd);
+        }
+        #endregion
+
+        #region =====Main page footer tests=====
+        [Test, Category("Footer")]
         public void FooterApplication_Column()
         {
             #region Expected strings
@@ -102,49 +232,53 @@ namespace NewLanding
             expected6 = "QUANTOWER API | Quantower API";
             expected7 = "Frequently asked questions — Quantower trading platform";
             #endregion
-
+            test = extent.StartTest("FooterApplication_Column");
+            test.Log(LogStatus.Info, formatedBegin);
             NewHomepageFooter footer = new NewHomepageFooter(Driver);
-            NewHomepage q = new NewHomepage(Driver);
-            q.ScrollOneFrame(10000);
+            PixelScroller(10000);
 
             Driver.FindElement(footer.features).Click();
-            Assert.IsTrue(Driver.Title == expected1, "Title isn't equal {0}", expected1);
+            Assertions(expected1, "Features");
 
             Driver.Navigate().Back();
             Driver.FindElement(footer.connections).Click();
-            Assert.IsTrue(Driver.Title == expected2, "Title isn't equal {0}", expected2);
+            Assertions(expected2, "Connections");
 
             Driver.Navigate().Back();
             Driver.FindElement(footer.roadmap).Click();
-            Assert.IsTrue(Driver.Title == expected3, "Title isn't equal {0}", expected3);
+            Assertions(expected3, "Roadmap");
 
             Driver.Navigate().Back();
             Driver.FindElement(footer.releaseNotes).Click();
-            Assert.IsTrue(Driver.Title == expected4, "Title isn't equal {0}", expected4);
+            Assertions(expected4, "Release notes");
 
             Driver.Navigate().Back();
             Driver.FindElement(footer.documentation).Click();
             Driver.SwitchTo().Window(Driver.WindowHandles[1]);
-            Assert.IsTrue(Driver.Title == expected5, "Title isn't equal {0}", expected5);
+            Assertions(expected5, "Documentation");
             Driver.Close();
             Driver.SwitchTo().Window(Driver.WindowHandles[0]);
-            
+
             Driver.FindElement(footer.apiReference).Click();
             Driver.SwitchTo().Window(Driver.WindowHandles[1]);
-            Assert.IsTrue(Driver.Title == expected6, "Title isn't equal {0}", expected6);
+            Assertions(expected6, "API references");
             Driver.Close();
 
             Driver.SwitchTo().Window(Driver.WindowHandles[0]);
             Driver.FindElement(footer.faq).Click();
-            Assert.IsTrue(Driver.Title == expected7, "Title isn't equal {0}", expected7);
-        }
+            Assertions(expected7, "FAQ");
 
-        [Test, Retry(3)]
+            test.Log(LogStatus.Info, formatedEnd);
+        }
+        
+        [Test, Category("Footer")]
         public void FooterCompany_Column()
         {
+            test = extent.StartTest("FooterCompany_Column");
+            test.Log(LogStatus.Info, formatedBegin);
             NewHomepageFooter footer = new NewHomepageFooter(Driver);
-            NewHomepage q = new NewHomepage(Driver);
-            q.ScrollOneFrame(10000);
+            
+            PixelScroller(10000);
 
             #region Expected strings
             string expected1, expected2, expected3, expected4, expected5, expected6;
@@ -157,40 +291,44 @@ namespace NewLanding
             #endregion
 
             Driver.FindElement(footer.team).Click();
-            Assert.IsTrue(Driver.Title == expected1, "Title isn't equal {0}", expected1);
+            Assertions(expected1, "Team");
+
             Driver.Navigate().Back();
 
             Driver.FindElement(footer.blog).Click();
-            Assert.IsTrue(Driver.Title == expected2, "Title isn't equal {0}", expected2);
+            Assertions(expected2, "Blog");
             Driver.Navigate().Back();
 
             Driver.FindElement(footer.BtB).Click();
-            Assert.IsTrue(Driver.Title == expected3, "Title isn't equal {0}", expected3);
+            Assertions(expected3, "B2B");
             Driver.Navigate().Back();
 
             Driver.FindElement(footer.contactUs).Click();
-            Assert.IsTrue(Driver.Title == expected4, "Title isn't equal {0}", expected4);
+            Assertions(expected4, "ContactUs");
             Driver.Navigate().Back();
 
             Driver.FindElement(footer.termsAndConditions).Click();
-            Assert.IsTrue(Driver.Title == expected5, "Title isn't equal {0}", expected5);
+            Assertions(expected5, "Terms and Conditions");
             Driver.Navigate().Back();
 
             Driver.FindElement(footer.privacyPolicy).Click();
-            Assert.IsTrue(Driver.Title == expected6, "Title isn't equal {0}", expected6);
+            Assertions(expected6, "Privacy policy");
+
+            test.Log(LogStatus.Info, formatedEnd);
         }
 
-        [Test, Retry(3)]
+        [Test, Category("Footer")]
         public void FooterSocials_Column()
         {
+            test = extent.StartTest("FooterSocials_Column");
+            test.Log(LogStatus.Info, formatedBegin);
             NewHomepageFooter footer = new NewHomepageFooter(Driver);
-            NewHomepage q = new NewHomepage(Driver);
-            q.ScrollOneFrame(10000);
+            PixelScroller(10000);
 
             #region Expected strings
             string expected1, expected2, expected3, expected4, expected5;
             expected1 = "Quantower - Главная | фейсбук";
-            expected2 = "Quantower | LinkedIn";
+            expected2 = "LinkedIn: Log In or Sign Up";
             expected3 = "Quantower (@Quantower_app) | Твиттер";
             expected4 = "Telegram: Contact @quantower_updates";
             expected5 = "Quantower trading platform - YouTube";
@@ -198,31 +336,99 @@ namespace NewLanding
 
             Driver.FindElement(footer.facebookFooter).Click();
             Driver.SwitchTo().Window(Driver.WindowHandles[1]);
-            Assert.IsTrue(Driver.Title == expected1, "Title isn't equal {0}", expected1);
+            Assertions(expected1, "Facebook");
             Driver.Close();
             Driver.SwitchTo().Window(Driver.WindowHandles[0]);
 
             Driver.FindElement(footer.linkedinFooter).Click();
             Driver.SwitchTo().Window(Driver.WindowHandles[1]);
-            Assert.IsTrue(Driver.Title == expected2, "Title isn't equal {0}", expected2);
+            Assertions(expected2, "LinkedIn");
             Driver.Close();
             Driver.SwitchTo().Window(Driver.WindowHandles[0]);
 
             Driver.FindElement(footer.twitterFooter).Click();
             Driver.SwitchTo().Window(Driver.WindowHandles[1]);
-            Assert.IsTrue(Driver.Title == expected3, "Title isn't equal {0}", expected3);
+            Assertions(expected3, "Twitter");
             Driver.Close();
             Driver.SwitchTo().Window(Driver.WindowHandles[0]);
 
             Driver.FindElement(footer.telgramFooter).Click();
             Driver.SwitchTo().Window(Driver.WindowHandles[1]);
-            Assert.IsTrue(Driver.Title == expected4, "Title isn't equal {0}", expected4);
+            Assertions(expected4, "Telegram");
             Driver.Close();
             Driver.SwitchTo().Window(Driver.WindowHandles[0]);
 
             Driver.FindElement(footer.youtubeFooter).Click();
             Driver.SwitchTo().Window(Driver.WindowHandles[1]);
-            Assert.IsTrue(Driver.Title == expected5, "Title isn't equal {0}", expected5);
+            Assertions(expected5, "Youtube");
+
+            test.Log(LogStatus.Info, formatedEnd);
         }
+        #endregion
+
+        #region =====Misc methods=====
+        public static string Capture(IWebDriver driver, string screenShotName)
+        {
+            string localpath = @"C:\TestData\" + screenShotName + ".jpeg";
+            ITakesScreenshot ts = (ITakesScreenshot)driver;
+            Screenshot screenshot = ts.GetScreenshot();
+            screenshot.SaveAsFile(localpath, ScreenshotImageFormat.Jpeg);
+            return localpath;
+        }
+
+        /// <summary>
+        /// Assertion with AreEqual()
+        /// </summary>
+        public void Assertions(string expected, string StepAndScreenshot, string message = "title")
+        {
+            string formatedMessagePass = $"<font color='green'><b>{StepAndScreenshot} passed</b></font>";
+            string formatedMessageFail = $"<font color='red'><b>{StepAndScreenshot} failed</b></font>";
+            try
+            {
+                Assert.AreEqual(expected, Driver.Title, StepAndScreenshot);
+                test.Log(LogStatus.Pass, formatedMessagePass);
+            }
+            catch
+            {
+                string screenShotPath = Capture(Driver, StepAndScreenshot);
+                test.Log(LogStatus.Fail, formatedMessageFail + test.AddScreenCapture(screenShotPath));
+                
+            }
+        }
+        /// <summary>
+        /// Assertion with IsTrue()
+        /// </summary>
+        public void Assertions(string expected, string StepAndScreenshot)
+        {
+            string formatedMessagePass = $"<font color='green'><b>{StepAndScreenshot} passed</b></font>";
+            string formatedMessageFail = $"<font color='red'><b>{StepAndScreenshot} failed</b></font>";
+            try
+            {
+                Assert.IsTrue(Driver.Title == expected, "Title isn't equal {0}", expected);
+                //test.Log(LogStatus.Pass, StepAndScreenshot);
+                test.Log(LogStatus.Pass, formatedMessagePass);
+            }
+            catch
+            {
+                string screenShotPath = Capture(Driver, StepAndScreenshot);
+                test.Log(LogStatus.Fail, formatedMessageFail + test.AddScreenCapture(screenShotPath));
+            }
+        }
+        public void CheckTestdataDirectory()
+        {
+            string directory = @"C:\TestData\";
+            bool testDataDirectory = Directory.Exists(directory);
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+        }
+        public void PixelScroller(int scroll)
+        {
+            string jsScroll = "window.scrollBy(0, " + scroll + ");";
+            IJavaScriptExecutor js = (IJavaScriptExecutor)Driver;
+            js.ExecuteScript(jsScroll);
+        }
+        #endregion
     }
 }
