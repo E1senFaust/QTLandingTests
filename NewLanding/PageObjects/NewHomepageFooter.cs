@@ -10,6 +10,7 @@ namespace NewLanding.PageObjects
         public NewHomepageFooter(IWebDriver chrome)
         {
             this.driver = chrome;
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromMilliseconds(10000);
         }
         //APPLICATION COLUMN
         #region =============Application column=============

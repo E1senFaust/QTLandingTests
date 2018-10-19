@@ -6,9 +6,11 @@ namespace NewLanding.PageObjects
     class NewHomepage
     {
         public readonly IWebDriver driver;
+        
         public NewHomepage(IWebDriver chrome)
         {
             this.driver = chrome;
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromMilliseconds(10000);
         }
 
         #region =============Elements in header=============

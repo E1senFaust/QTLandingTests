@@ -24,7 +24,7 @@ namespace NewLanding
         public ExtentTest test;
         string formatedBegin;
         string formatedEnd;
-        string expected1, expected2, expected3, expected4, expected5, expected6, expected7;
+        string expected1, expected2, expected3, expected4, expected5, expected6, expected7, expected8, expected9;
 
         #region +++++Test initialization+++++
         [OneTimeSetUp]
@@ -32,7 +32,7 @@ namespace NewLanding
         {
             CheckTestdataDirectory();
             string reportPath = @"C:\TestData\TestReport.html";
-            extent = new ExtentReports(reportPath, true);
+            extent = new ExtentReports(reportPath, true, DisplayOrder.NewestFirst);
             extent.AddSystemInfo("Environment", System.Environment.OSVersion.ToString() + "<br>Processors count "+System.Environment.ProcessorCount.ToString() + "<br>Windows 8.1,  Chrome, x64OS")
                   .AddSystemInfo("Username", System.Environment.UserName.ToString());
             
@@ -63,7 +63,7 @@ namespace NewLanding
             }
             extent.EndTest(test);
 
-            //this.Driver.Manage().Cookies.DeleteAllCookies();
+            this.Driver.Manage().Cookies.DeleteAllCookies();
             Driver.Quit();
         }
 
@@ -335,7 +335,7 @@ namespace NewLanding
             #region Expected strings
             string expected1, expected2, expected3, expected4, expected5;
             expected1 = "Quantower - Главная | фейсбук";
-            expected2 = "LinkedIn: Log In or Sign Up";
+            expected2 = "Quantower | LinkedIn";
             expected3 = "Quantower (@Quantower_app) | Твиттер";
             expected4 = "Telegram: Contact @quantower_updates";
             expected5 = "Quantower trading platform - YouTube";
@@ -376,6 +376,108 @@ namespace NewLanding
             Driver.SwitchTo().Window(Driver.WindowHandles[1]);
             Assertions(expected5, "Youtube");
 
+            test.Log(LogStatus.Info, formatedEnd);
+        }
+        #endregion
+
+        #region =====Connections=====
+        [Test, Category("Connections")]
+        public void AvailableConnectionsLinks()
+        {
+            #region Expected strings
+            expected1 = "LMAX Global | The FCA regulated broker for FX";
+            expected2 = "Trade Forex and Crypto CFD's on a LMAX Global Introducing Broker";
+            expected3 = "cTrader Trading | Advanced Trading, Fast Entry & Execution | Spotware";
+            expected4 = "Individual agreement open live account | Tradeview Forex";
+            expected5 = "Poloniex - Bitcoin/Digital Asset Exchange";
+            expected6 = "Binance - Blockchain and Crypto Asset Exchange";
+            expected7 = "Bitcoin Exchange: Bitcoin, Ethereum, Monero, Zcash / HitBTC";
+            expected8 = "Kraken | Buy, Sell and Margin Trade Bitcoin (BTC) and Ethereum (ETH) - Buy, Sell, & Trade Bitcoin";
+            expected9 = "Bitfinex - Bitcoin, Litecoin and Ethereum Exchange and Margin Trading Platform";
+            #endregion
+
+            test = extent.StartTest("Connections");
+            test.Log(LogStatus.Info, formatedBegin);
+            Driver.Navigate().GoToUrl("https://www.quantower.com/connections");
+            ConnectionsPage conn = new ConnectionsPage(this.Driver);
+            Driver.FindElement(conn.lmax).Click();
+            Driver.SwitchTo().Window(Driver.WindowHandles[1]);
+            Assertions(expected1, "LMAX");
+            Driver.Close();
+            Driver.SwitchTo().Window(Driver.WindowHandles[0]);
+
+            Driver.FindElement(conn.fxmtf).Click();
+            Driver.SwitchTo().Window(Driver.WindowHandles[1]);
+            Assertions(expected2, "FXMTF");
+            Driver.Close();
+            Driver.SwitchTo().Window(Driver.WindowHandles[0]);
+
+            Driver.FindElement(conn.ctrader).Click();
+            Driver.SwitchTo().Window(Driver.WindowHandles[1]);
+            Assertions(expected3, "cTrader");
+            Driver.Close();
+            Driver.SwitchTo().Window(Driver.WindowHandles[0]);
+
+            Driver.FindElement(conn.tradeview).Click();
+            Driver.SwitchTo().Window(Driver.WindowHandles[1]);
+            Assertions(expected4, "Tradeview");
+            Driver.Close();
+            Driver.SwitchTo().Window(Driver.WindowHandles[0]);
+
+            Driver.FindElement(conn.poloniex).Click();
+            Driver.SwitchTo().Window(Driver.WindowHandles[1]);
+            Assertions(expected5, "Poloniex");
+            Driver.Close();
+            Driver.SwitchTo().Window(Driver.WindowHandles[0]);
+
+            Driver.FindElement(conn.binance).Click();
+            Driver.SwitchTo().Window(Driver.WindowHandles[1]);
+            Assertions(expected6, "Binance");
+            Driver.Close();
+            Driver.SwitchTo().Window(Driver.WindowHandles[0]);
+
+            Driver.FindElement(conn.hitBTC).Click();
+            Driver.SwitchTo().Window(Driver.WindowHandles[1]);
+            Assertions(expected7, "HitBTC");
+            Driver.Close();
+            Driver.SwitchTo().Window(Driver.WindowHandles[0]);
+
+            Driver.FindElement(conn.kraken).Click();
+            Driver.SwitchTo().Window(Driver.WindowHandles[1]);
+            Assertions(expected8, "Kraken");
+            Driver.Close();
+            Driver.SwitchTo().Window(Driver.WindowHandles[0]);
+
+            Driver.FindElement(conn.bitfinex).Click();
+            Driver.SwitchTo().Window(Driver.WindowHandles[1]);
+            Assertions(expected9, "Bitfinex");
+            test.Log(LogStatus.Info, formatedEnd);
+        }
+
+        [Ignore("Later")]
+        [Test, Category("Connections")]
+        public void ContactUs_andDownloadButton()
+        {
+            expected1 = "Quantower, contact us — Quantower trading platform";
+            test = extent.StartTest("Connections");
+            test.Log(LogStatus.Info, formatedBegin);
+            Driver.Navigate().GoToUrl("https://www.quantower.com/connections");
+            ConnectionsPage conn = new ConnectionsPage(this.Driver);
+            //PixelScroller(700);
+            Driver.FindElement(conn.contactUs).Click();
+            Assertions(expected1, "Contact Us page");
+            Driver.Navigate().Back();
+           // Driver.FindElement(conn.downloadBtn).Click();
+            try
+            {
+                Assert.AreEqual("open", Driver.FindElement(conn.downloadScreen).GetAttribute("class").ToString());
+                test.Log(LogStatus.Pass, "Download screen appears");
+            }
+            catch
+            {
+                test.Log(LogStatus.Fail, "Download screen is not displayed");
+                Exception e;
+            }
             test.Log(LogStatus.Info, formatedEnd);
         }
         #endregion
